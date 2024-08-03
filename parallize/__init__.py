@@ -39,7 +39,9 @@ def aparallize(
     """
 
     @functools.wraps(async_function)
-    def wrapper(*args: T_ParamSpec.args, **kwargs: T_ParamSpec.kwargs) -> T_Retval:
+    async def wrapper(
+        *args: T_ParamSpec.args, **kwargs: T_ParamSpec.kwargs
+    ) -> T_Retval:
         partial_f = functools.partial(async_function, *args, **kwargs)
 
         def inner_wrapper(*args: Any, **kwargs: Any):
@@ -54,7 +56,7 @@ def aparallize(
 def parallize(
     function: Callable[T_ParamSpec, T_Retval],
     max_workers: Union[int, None] = None,
-) -> Callable[T_ParamSpec, Awaitable[T_Retval]]:
+) -> Callable[T_ParamSpec, T_Retval]:
     """
     A decorator that parallelizes a given function by executing it in a separate process.
 
@@ -66,11 +68,14 @@ def parallize(
     A wrapper function that, when called, will execute the original function in a separate process.
     """
 
-    async def wrapper(
-        *args: T_ParamSpec.args, **kwargs: T_ParamSpec.kwargs
-    ) -> T_Retval:
+    @functools.wraps(function)
+    def wrapper(*args: T_ParamSpec.args, **kwargs: T_ParamSpec.kwargs) -> T_Retval:
         partial_f = functools.partial(function, *args, **kwargs)
+
+        def inner_wrapper(*args: Any, **kwargs: Any):
+            return asyncio.run(partial_f(*args, **kwargs))
+
         with ProcessPoolExecutor(max_workers=max_workers) as executor:
-            return executor.submit(partial_f, *args, **kwargs)
+            return executor.submit(inner_wrapper, *args, **kwargs)
 
     return wrapper
