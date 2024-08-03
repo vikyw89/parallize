@@ -129,8 +129,10 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## Issues
 
-If you encounter any issues or have suggestions for improvements, please open an issue on the [GitHub repository](https://github.com/yourusername/parallize/issues).
+If you encounter any issues or have suggestions for improvements, please open an issue on the [GitHub repository](https://github.com/vikyw89/parallize/issues).
 
 ## Acknowledgments
 
 - Thanks to the Python community for providing powerful tools and libraries for parallel processing.
+
+@vikyw89-20240804
