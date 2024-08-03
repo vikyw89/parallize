@@ -23,12 +23,12 @@ Parallize is a Python package that provides utilities to parallelize both synchr
 - parallel are the same function but with @parallize decorator or parallize function
   Here are the benchmark results comparing serial and parallel execution times:
 
-| Test Case                   | Serial Execution Time | Parallel Execution Time |
-| --------------------------- | --------------------- | ----------------------- |
-| `test_aparallize`           | 0:00:04.073584        | 0:00:00.017007          |
-| `test_aparallize_decorator` | 0:00:04.027461        | 0:00:00.014918          |
-| `test_parallize`            | 0:00:04.057500        | 0:00:00.013410          |
-| `test_parallize_decorator`  | 0:00:04.042075        | 0:00:00.015465          |
+| Test Case                   | Serial Execution Time | Parallel Execution Time | Speedup |
+| --------------------------- | --------------------- | ----------------------- | ------- |
+| `test_aparallize`           | 0:00:04.073584        | 0:00:00.017007          | 239.5x  |
+| `test_aparallize_decorator` | 0:00:04.027461        | 0:00:00.014918          | 269.9x  |
+| `test_parallize`            | 0:00:04.057500        | 0:00:00.013410          | 302.6x  |
+| `test_parallize_decorator`  | 0:00:04.042075        | 0:00:00.015465          | 261.4x  |
 
 ## Installation
 
