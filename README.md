@@ -8,8 +8,6 @@ Parallize is a Python package that provides utilities to parallelize both synchr
 - **Parallelize Asynchronous Functions**: Execute asynchronous functions in parallel using multiple processes.
 - **Customizable Worker Count**: Specify the maximum number of worker processes to use, or let the package use the number of available CPU cores by default.
 
-## Mini benchmark
-
 # Parallize
 
 Parallize is a Python package that provides utilities to parallelize both synchronous and asynchronous functions using the `concurrent.futures.ProcessPoolExecutor`. This allows you to execute functions in separate processes, leveraging multiple CPU cores for improved performance.
