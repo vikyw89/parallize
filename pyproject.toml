@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "parallize"
-version = "0.1.2"
-description = ""
+version = "0.1.3"
+description = "Parallize is a Python package that provides utilities to parallelize both synchronous and asynchronous functions using the `concurrent.futures.ProcessPoolExecutor`."
 authors = ["vikyw89 <vikyw89@gmail.com>"]
 readme = "README.md"
 

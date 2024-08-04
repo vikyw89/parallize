@@ -102,21 +102,6 @@ async def my_async_function(x, y):
     return x + y
 ```
 
-or
-
-```python
-
-def my_function(x, y):
-    return x + y
-
-async def my_async_function(x, y):
-    await asyncio.sleep(1)
-    return x + y
-
-parallize(my_function,max_workers=4)(1, 2)
-aparallize(my_async_function,max_workers=4)(1, 2)
-```
-
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
