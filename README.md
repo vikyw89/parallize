@@ -33,50 +33,14 @@ pip install parallize
 
 ## Usage
 
-### Parallelizing Synchronous Functions Using Decorator
-
-To parallelize a synchronous function, use the `parallize` decorator:
-
 ```python
-from parallize import parallize
-
-@parallize
-def my_function(x, y):
-    return x + y
-
-# Call the function as usual
-result = my_function(1, 2)
-print(result)  # This will be executed in a separate process
-```
-
-### Parallelizing Asynchronous Functions Using Decorator
-
-To parallelize an asynchronous function, use the `aparallize` decorator:
-
-```python
-import asyncio
 from parallize import aparallize
 
-@aparallize
-async def my_async_function(x, y):
-    await asyncio.sleep(1)
-    return x + y
-
-# Call the function as usual
-result = my_async_function(1, 2)
-print(result)  # This will be executed in a separate process
-```
-
-### Another Usage Without Decorator
-
-```python
-from parallize import parallize
-
 def my_function(x, y):
     return x + y
 
 # Call the function as usual
-result = parallize(my_function)(1, 2)
+result = await aparallize(my_function)(1, 2)
 print(result)  # This will be executed in a separate process
 ```
 
@@ -85,14 +49,10 @@ print(result)  # This will be executed in a separate process
 You can specify the maximum number of worker processes to use by passing the `max_workers` argument to the decorator:
 
 ```python
-@parallize(max_workers=4)
 def my_function(x, y):
     return x + y
 
-@aparallize(max_workers=4)
-async def my_async_function(x, y):
-    await asyncio.sleep(1)
-    return x + y
+result = await aparallize(my_function, max_workers=4)(1, 2)
 ```
 
 ## License
