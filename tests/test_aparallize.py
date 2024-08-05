@@ -1,59 +1,74 @@
+import asyncio
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
-from parallize import aparallize
 import pytest
-from utils import TimeLogger
+from parallize import aparallize
 
 
-async def acpuboundtask(rn: int = 10**6) -> int:
+def cpuboundtask(rn: int = 10**6) -> int:
     # Simulate a CPU-bound task by performing some calculations
-    for _ in range(100):
-        result = sum(i * i for i in range(rn))
-    return result
-
-
-@aparallize
-async def acpuboundtask_w_aparallize(rn: int = 10**6) -> int:
-    # Simulate a CPU-bound task by performing some calculations
-    for _ in range(100):
+    for _ in range(200):
         result = sum(i * i for i in range(rn))
     return result
 
 
 @pytest.mark.asyncio
-async def test_aparallize():
+async def test_aparallize_fn():
     start_time = datetime.now()
 
-    await acpuboundtask(rn=10**6)
+    # Concurrent execution
+    with ThreadPoolExecutor() as executor:
+        coros = [executor.submit(cpuboundtask, rn=10**6) for _ in range(2)]
+        result = [c.result() for c in coros]
 
     end_time = datetime.now()
     without_parallize = end_time - start_time
+
     print(f"Serial execution time: {without_parallize}")
+    print(f"Result: {result}")
 
     start_time = datetime.now()
 
-    await aparallize(acpuboundtask)(rn=10**6)
+    # Parallel execution
+    coros = [aparallize(cpuboundtask)(rn=10**6) for _ in range(2)]
+    parallized_result = await asyncio.gather(*coros)
 
     end_time = datetime.now()
     with_parallize = end_time - start_time
-    print(f"Parallel execution time: {with_parallize}")
 
-    assert without_parallize.total_seconds() > (with_parallize.total_seconds() * 2)
+    print(f"Parallel execution time: {with_parallize}")
+    print(f"Parallized Result: {parallized_result}")
+
+    assert result == parallized_result
+    assert without_parallize.total_seconds() > with_parallize.total_seconds()
 
 
 @pytest.mark.asyncio
-async def test_aparallize_decorator():
+async def test_aparallize_10():
     start_time = datetime.now()
-    await acpuboundtask(rn=10**6)
+
+    # Concurrent execution
+    with ThreadPoolExecutor() as executor:
+        coros = [executor.submit(cpuboundtask, rn=10**6) for _ in range(10)]
+        result = [c.result() for c in coros]
+
     end_time = datetime.now()
     without_parallize = end_time - start_time
+
     print(f"Serial execution time: {without_parallize}")
+    print(f"Result: {result}")
 
     start_time = datetime.now()
 
-    await acpuboundtask_w_aparallize(rn=10**6)
+    # Parallel execution
+    coros = [aparallize(cpuboundtask)(rn=10**6) for _ in range(10)]
+    parallized_result = await asyncio.gather(*coros)
 
     end_time = datetime.now()
     with_parallize = end_time - start_time
-    print(f"Parallel execution time: {with_parallize}")
 
-    assert without_parallize.total_seconds() > (with_parallize.total_seconds() * 2)
+    print(f"Parallel execution time: {with_parallize}")
+    print(f"Parallized Result: {parallized_result}")
+
+    assert result == parallized_result
+    assert without_parallize.total_seconds() > with_parallize.total_seconds()

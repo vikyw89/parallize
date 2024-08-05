@@ -1,6 +1,6 @@
 # Parallize
 
-Parallize is a Python package that provides utilities to parallelize both synchronous and asynchronous functions using the `concurrent.futures.ProcessPoolExecutor`. This allows you to execute functions in separate processes, leveraging multiple CPU cores for improved performance.
+Parallize is a Python package that provides utilities to parallelize synchronous functions using the `concurrent.futures.ProcessPoolExecutor` and convert it into async functions to prevent the main thread from blocking. This allows you to execute functions in separate processes, leveraging multiple CPU cores for improved performance.
 
 ## Features
 
@@ -8,27 +8,20 @@ Parallize is a Python package that provides utilities to parallelize both synchr
 - **Parallelize Asynchronous Functions**: Execute asynchronous functions in parallel using multiple processes.
 - **Customizable Worker Count**: Specify the maximum number of worker processes to use, or let the package use the number of available CPU cores by default.
 
-# Parallize
+## Mini Benchmark
 
-Parallize is a Python package that provides utilities to parallelize both synchronous and asynchronous functions using the `concurrent.futures.ProcessPoolExecutor`. This allows you to execute functions in separate processes, leveraging multiple CPU cores for improved performance.
+Here are the updated benchmark results comparing serial and parallel execution times using the `test_aparallize.py` test case:
 
-## Features
+| Test Case            | Concurrent Execution Time | Parallel Execution Time | Speedup | Tasks Count |
+| -------------------- | ------------------------- | ----------------------- | ------- | ----------- |
+| `test_aparallize_fn` | 0:00:17.215937            | 0:00:08.293026          | 2.08x   | 2           |
+| `test_aparallize_10` | 0:01:25.070893            | 0:00:13.997451          | 5.94x   | 10          |
 
-- **Parallelize Synchronous Functions**: Execute synchronous functions in parallel using multiple processes.
-- **Parallelize Asynchronous Functions**: Execute asynchronous functions in parallel using multiple processes.
-- **Customizable Worker Count**: Specify the maximum number of worker processes to use, or let the package use the number of available CPU cores by default.
+### Benchmark Details
 
-## Mini benchmark
-
-- parallel are the same function but with @parallize decorator or parallize function
-  Here are the benchmark results comparing serial and parallel execution times:
-
-| Test Case                   | Serial Execution Time | Parallel Execution Time | Speedup |
-| --------------------------- | --------------------- | ----------------------- | ------- |
-| `test_aparallize`           | 0:00:04.073584        | 0:00:00.017007          | 239.5x  |
-| `test_aparallize_decorator` | 0:00:04.027461        | 0:00:00.014918          | 269.9x  |
-| `test_parallize`            | 0:00:04.057500        | 0:00:00.013410          | 302.6x  |
-| `test_parallize_decorator`  | 0:00:04.042075        | 0:00:00.015465          | 261.4x  |
+- **Concurrent Execution Time**: The time taken to execute the CPU-bound task concurrently using a `ThreadPoolExecutor`.
+- **Parallel Execution Time**: The time taken to execute the same task in parallel using the `aparallize` decorator.
+- **Speedup**: The ratio of serial execution time to parallel execution time, indicating the performance improvement achieved by parallelizing the task.
 
 ## Installation
 
@@ -74,7 +67,7 @@ result = my_async_function(1, 2)
 print(result)  # This will be executed in a separate process
 ```
 
-## Another usage without decorator
+### Another Usage Without Decorator
 
 ```python
 from parallize import parallize

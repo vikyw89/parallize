@@ -1,21 +1,17 @@
 import asyncio
-import functools
+from concurrent.futures import ProcessPoolExecutor
 import sys
 from typing import (
-    Any,
     Awaitable,
     Callable,
-    Coroutine,
     TypeVar,
-    Union,
 )
+
 
 if sys.version_info >= (3, 10):
     from typing import ParamSpec
 else:
     from typing_extensions import ParamSpec
-
-from concurrent.futures import ProcessPoolExecutor
 
 
 T_Retval = TypeVar("T_Retval")
@@ -24,58 +20,26 @@ T = TypeVar("T")
 
 
 def aparallize(
-    async_function: Callable[T_ParamSpec, Coroutine[Any, Any, T_Retval]],
-    max_workers: Union[int, None] = None,
+    function: Callable[T_ParamSpec, T_Retval],
+    max_workers: int | None = None,
 ) -> Callable[T_ParamSpec, Awaitable[T_Retval]]:
     """
-    Creates a parallelized version of the given async function.
+    Takes a blocking function and creates an async one that receives the same positional and keyword arguments, and that when called, calls the original function in a worker thread using `anyio.to_thread.run_sync()`. Internally, `asyncer.asyncify()` uses the same `anyio.to_thread.run_sync()`, but it supports keyword arguments additional to positional arguments and it adds better support for autocompletion and inline errors for the arguments of the function called and the return value.
 
     Args:
-        async_function (Callable[T_ParamSpec, Coroutine[Any, Any, T_Retval]]): The async function to be parallelized.
-        max_workers (Union[int, None], optional): The maximum number of worker processes to use. If None, it will use the number of available CPU cores. Defaults to None.
+        function (Callable[T_ParamSpec, T_Retval]): A blocking regular callable (e.g. a function).
+        max_workers (int | None, optional): The maximum number of worker threads to use. Defaults to None.
 
     Returns:
-        Callable[T_ParamSpec, Awaitable[T_Retval]]: A wrapper function that, when called, will execute the original function in a separate process.
+        Callable[T_ParamSpec, Awaitable[T_Retval]]: An async function that takes the same positional and keyword arguments as the original one, that when called runs the same original function in a thread worker and returns the result.
     """
 
-    @functools.wraps(async_function)
     async def wrapper(
         *args: T_ParamSpec.args, **kwargs: T_ParamSpec.kwargs
     ) -> T_Retval:
-        partial_f = functools.partial(async_function, *args, **kwargs)
-
-        def inner_wrapper(*args: Any, **kwargs: Any):
-            return asyncio.run(partial_f(*args, **kwargs))
-
         with ProcessPoolExecutor(max_workers=max_workers) as executor:
-            return executor.submit(inner_wrapper, *args, **kwargs)
-
-    return wrapper
-
-
-def parallize(
-    function: Callable[T_ParamSpec, T_Retval],
-    max_workers: Union[int, None] = None,
-) -> Callable[T_ParamSpec, T_Retval]:
-    """
-    A decorator that parallelizes a given function by executing it in a separate process.
-
-    Args:
-    function: The function to be parallelized.
-    max_workers: The maximum number of worker processes to use. If None, it will use the number of available CPU cores.
-
-    Returns:
-    A wrapper function that, when called, will execute the original function in a separate process.
-    """
-
-    @functools.wraps(function)
-    def wrapper(*args: T_ParamSpec.args, **kwargs: T_ParamSpec.kwargs) -> T_Retval:
-        partial_f = functools.partial(function, *args, **kwargs)
-
-        def inner_wrapper(*args: Any, **kwargs: Any):
-            return asyncio.run(partial_f(*args, **kwargs))
-
-        with ProcessPoolExecutor(max_workers=max_workers) as executor:
-            return executor.submit(inner_wrapper, *args, **kwargs)
+            process = executor.submit(function, *args, **kwargs)
+            loop = asyncio.get_event_loop()
+            return await loop.run_in_executor(None, process.result)
 
     return wrapper
